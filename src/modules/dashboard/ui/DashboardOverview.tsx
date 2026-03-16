@@ -14,19 +14,12 @@ import { InvoicePreviewModal } from "./InvoicePreviewModal";
 
 // Widgets
 import { WelcomeBannerWidget } from "./widgets/WelcomeBannerWidget";
-import { KpiInvoicesWidget } from "./widgets/KpiInvoicesWidget";
-import { KpiRevenueWidget } from "./widgets/KpiRevenueWidget";
-import { KpiTaxWidget } from "./widgets/KpiTaxWidget";
-import { KpiAvgValueWidget } from "./widgets/KpiAvgValueWidget";
 import { KpiSystemWidget } from "./widgets/KpiSystemWidget";
-import { RevenueChartWidget } from "./widgets/RevenueChartWidget";
 import { InvoicesBarChartWidget } from "./widgets/InvoicesBarChartWidget";
 import { DailyRevenueChartWidget } from "./widgets/DailyRevenueChartWidget";
-import { StatusPieChartWidget } from "./widgets/StatusPieChartWidget";
 import { TaxVsRevenueChartWidget } from "./widgets/TaxVsRevenueChartWidget";
 import { RecentInvoicesWidget } from "./widgets/RecentInvoicesWidget";
 import { TopClientsWidget } from "./widgets/TopClientsWidget";
-import { ClientOfMonthWidget } from "./widgets/ClientOfMonthWidget";
 
 export function DashboardOverview() {
   const { data, loading, error, lastUpdated, isRefreshing, refresh } =
@@ -68,14 +61,6 @@ export function DashboardOverview() {
     switch (widgetId) {
       case "welcome-banner":
         return <WelcomeBannerWidget {...common} system={system} />;
-      case "kpi-invoices":
-        return <KpiInvoicesWidget {...common} data={invoices} />;
-      case "kpi-revenue":
-        return <KpiRevenueWidget {...common} data={invoices} />;
-      case "kpi-tax":
-        return <KpiTaxWidget {...common} data={invoices} />;
-      case "kpi-avg-value":
-        return <KpiAvgValueWidget {...common} data={invoices} />;
       case "kpi-users":
         return (
           <KpiSystemWidget
@@ -94,28 +79,6 @@ export function DashboardOverview() {
             invoices={invoices}
           />
         );
-      case "kpi-company":
-        return (
-          <KpiSystemWidget
-            {...common}
-            variant="company"
-            system={system}
-            invoices={invoices}
-          />
-        );
-      case "kpi-api":
-        return (
-          <KpiSystemWidget
-            {...common}
-            variant="api"
-            system={system}
-            invoices={invoices}
-          />
-        );
-      case "client-of-month":
-        return <ClientOfMonthWidget {...common} />;
-      case "chart-revenue":
-        return <RevenueChartWidget {...common} data={invoices.monthlyData} />;
       case "chart-invoices-bar":
         return (
           <InvoicesBarChartWidget {...common} data={invoices.monthlyData} />
@@ -123,10 +86,6 @@ export function DashboardOverview() {
       case "chart-daily-revenue":
         return (
           <DailyRevenueChartWidget {...common} data={invoices.dailyRevenue} />
-        );
-      case "chart-status-pie":
-        return (
-          <StatusPieChartWidget {...common} data={invoices.statusBreakdown} />
         );
       case "chart-tax-vs-revenue":
         return (

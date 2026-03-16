@@ -76,3 +76,15 @@ export interface NumberingRange {
   id: number;
   prefix: string;
 }
+
+export interface SavedCustomer {
+  identification: string;
+  names: string;
+  email: string;
+  phone: string;
+  address: string;
+  identificationDocumentId: string;
+  legalOrganizationId: string;
+  tributeId: string;
+  updatedAt: string;
+}

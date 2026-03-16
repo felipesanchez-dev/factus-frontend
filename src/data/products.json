@@ -10,11 +10,11 @@
     "taxRate": 19,
     "discount": 0,
     "discountRate": 0,
-    "stock": 100,
+    "stock": 99,
     "unitMeasure": "Unidad",
     "isActive": true,
     "createdAt": "2026-02-21T23:42:28.575Z",
-    "updatedAt": "2026-03-16T03:50:09.451Z"
+    "updatedAt": "2026-03-16T03:59:17.246Z"
   },
   {
     "id": "prod_mmsncvi0_tho7q",
@@ -27,10 +27,10 @@
     "taxRate": 19,
     "discount": 0,
     "discountRate": 0,
-    "stock": 100,
+    "stock": 99,
     "unitMeasure": "Unidad",
     "isActive": true,
     "createdAt": "2026-03-16T03:51:46.296Z",
-    "updatedAt": "2026-03-16T03:51:48.678Z"
+    "updatedAt": "2026-03-16T03:59:17.246Z"
   }
 ]

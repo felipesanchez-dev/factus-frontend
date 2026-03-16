@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,8 +16,11 @@ import {
   MapPin,
   Receipt,
   Banknote,
+  Loader2,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/shared/components/Button";
+import { lookupCustomerAction } from "../infrastructure/tienda.actions";
 import type { CartItem, CustomerData, PaymentInfo } from "../domain/tienda.types";
 
 interface CheckoutFormProps {
@@ -115,9 +118,54 @@ export function CheckoutForm({ items, onBack, onSubmit, loading, error }: Checko
     paymentMethodCode: "10",
   });
 
+  const [lookingUp, setLookingUp] = useState(false);
+  const [customerFound, setCustomerFound] = useState(false);
+  const lookupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const lookupCustomer = useCallback(async (identification: string) => {
+    if (identification.trim().length < 4) {
+      setCustomerFound(false);
+      return;
+    }
+    setLookingUp(true);
+    try {
+      const found = await lookupCustomerAction(identification.trim());
+      if (found) {
+        setCustomer({
+          identification: found.identification,
+          names: found.names,
+          email: found.email,
+          phone: found.phone,
+          address: found.address,
+          identificationDocumentId: found.identificationDocumentId,
+          legalOrganizationId: found.legalOrganizationId,
+          tributeId: found.tributeId,
+        });
+        setCustomerFound(true);
+      } else {
+        setCustomerFound(false);
+      }
+    } catch {
+      setCustomerFound(false);
+    } finally {
+      setLookingUp(false);
+    }
+  }, []);
+
   function updateCustomer(field: keyof CustomerData, value: string) {
     setCustomer((prev) => ({ ...prev, [field]: value }));
+    if (field === "identification") {
+      setCustomerFound(false);
+      if (lookupTimer.current) clearTimeout(lookupTimer.current);
+      lookupTimer.current = setTimeout(() => lookupCustomer(value), 600);
+    }
   }
+
+  useEffect(() => {
+    return () => {
+      if (lookupTimer.current) clearTimeout(lookupTimer.current);
+    };
+  }, []);
 
   // Totals
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -315,13 +363,34 @@ export function CheckoutForm({ items, onBack, onSubmit, loading, error }: Checko
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
                 Numero de documento *
               </label>
-              <input
-                type="text"
-                value={customer.identification}
-                onChange={(e) => updateCustomer("identification", e.target.value)}
-                placeholder="123456789"
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={customer.identification}
+                  onChange={(e) => updateCustomer("identification", e.target.value)}
+                  placeholder="123456789"
+                  className={`w-full rounded-lg border bg-white dark:bg-gray-900 px-3 py-2.5 pr-10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-1 ${
+                    customerFound
+                      ? "border-emerald-400 dark:border-emerald-500 focus:border-emerald-500 focus:ring-emerald-500"
+                      : "border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500"
+                  }`}
+                />
+                {lookingUp && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                  </div>
+                )}
+                {customerFound && !lookingUp && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <UserCheck className="h-4 w-4 text-emerald-500" />
+                  </div>
+                )}
+              </div>
+              {customerFound && (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                  Cliente encontrado — datos autocompletados
+                </p>
+              )}
             </div>
 
             <div className="sm:col-span-2">

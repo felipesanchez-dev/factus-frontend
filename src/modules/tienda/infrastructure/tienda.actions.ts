@@ -14,6 +14,7 @@ import type {
   InvoiceResult,
   Sale,
   NumberingRange,
+  SavedCustomer,
 } from "../domain/tienda.types";
 
 // ─── Productos de la sucursal ─────────────────────────────────────────
@@ -222,6 +223,9 @@ export async function createInvoiceAction(data: CreateInvoiceInput): Promise<Inv
     }
     await writeJsonFile("products.json", products);
 
+    // Guardar/actualizar datos del cliente para autocompletado futuro
+    await saveOrUpdateCustomer(data.customer);
+
     return {
       success: true,
       billNumber,
@@ -255,6 +259,35 @@ export async function getSalesAction(branchId?: string): Promise<Sale[]> {
   const sales = await readJsonFile<Sale[]>("sales.json");
   if (branchId) return sales.filter((s) => s.branchId === branchId);
   return sales;
+}
+
+// ─── Clientes guardados ──────────────────────────────────────────────
+
+export async function lookupCustomerAction(identification: string): Promise<SavedCustomer | null> {
+  const customers = await readJsonFile<SavedCustomer[]>("customers.json");
+  return customers.find((c) => c.identification === identification) ?? null;
+}
+
+async function saveOrUpdateCustomer(customer: CustomerData): Promise<void> {
+  const customers = await readJsonFile<SavedCustomer[]>("customers.json");
+  const index = customers.findIndex((c) => c.identification === customer.identification);
+  const entry: SavedCustomer = {
+    identification: customer.identification,
+    names: customer.names,
+    email: customer.email,
+    phone: customer.phone,
+    address: customer.address,
+    identificationDocumentId: customer.identificationDocumentId,
+    legalOrganizationId: customer.legalOrganizationId,
+    tributeId: customer.tributeId,
+    updatedAt: new Date().toISOString(),
+  };
+  if (index >= 0) {
+    customers[index] = entry;
+  } else {
+    customers.push(entry);
+  }
+  await writeJsonFile("customers.json", customers);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────

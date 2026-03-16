@@ -100,5 +100,51 @@
     "paymentMethod": "Efectivo",
     "status": "validada",
     "createdAt": "2026-03-16T03:44:50.266Z"
+  },
+  {
+    "id": "sale_mmsnmjg9_mn9ui",
+    "branchId": "br_mlwxqt6e_028aj",
+    "sellerId": "usr_mlx33s4j_yr4a9",
+    "sellerName": "Factus Vendedor",
+    "billNumber": "SETP990026271",
+    "referenceCode": "VTA-MMSNMHAP",
+    "cufe": "c02ef62757dc26900dbd89e5c02a012583e4dabe60e418335a4de6569cabf1295b0b25373e0745afac1377cc0c919ce6",
+    "publicUrl": "http://app-sandbox.factus.com.co/documents/bills/0e8482399a6a67d2b036bb937f8181d45dd10f0801e0d48fc58f95cd90c9720d",
+    "customerName": "Juan Felipe Reyes Sanchez",
+    "customerIdentification": "1105461659",
+    "items": [
+      {
+        "productId": "prod_mlwyrjds_pea5j",
+        "code": "COD01",
+        "name": "MacBook Air de 15 pulgadas",
+        "quantity": 1,
+        "price": 7399000,
+        "taxRate": 19,
+        "discountRate": 0,
+        "subtotal": 7399000,
+        "taxAmount": 1405810,
+        "total": 8804810
+      },
+      {
+        "productId": "prod_mmsncvi0_tho7q",
+        "code": "COD02",
+        "name": "iPhone 17 Pro Max 256GB 5G Plata",
+        "quantity": 1,
+        "price": 6878010,
+        "taxRate": 19,
+        "discountRate": 0,
+        "subtotal": 6878010,
+        "taxAmount": 1306822,
+        "total": 8184832
+      }
+    ],
+    "subtotal": 14277010,
+    "taxTotal": 2712632,
+    "discountTotal": 0,
+    "total": 14277010,
+    "paymentForm": "Contado",
+    "paymentMethod": "Efectivo",
+    "status": "validada",
+    "createdAt": "2026-03-16T03:59:17.241Z"
   }
 ]

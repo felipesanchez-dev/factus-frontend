@@ -15,19 +15,10 @@ export interface GridLayoutItem {
 /** Every widget in the dashboard has a unique string identifier. */
 export type WidgetId =
   | "welcome-banner"
-  | "kpi-invoices"
-  | "kpi-revenue"
-  | "kpi-tax"
-  | "kpi-avg-value"
   | "kpi-users"
   | "kpi-branches"
-  | "kpi-company"
-  | "kpi-api"
-  | "client-of-month"
-  | "chart-revenue"
   | "chart-invoices-bar"
   | "chart-daily-revenue"
-  | "chart-status-pie"
   | "chart-tax-vs-revenue"
   | "table-recent-invoices"
   | "table-top-clients";
