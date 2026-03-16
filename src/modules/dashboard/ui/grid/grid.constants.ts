@@ -5,7 +5,7 @@ export const GRID_COLS = { lg: 12, md: 10, sm: 6, xs: 2 };
 export const GRID_ROW_HEIGHT = 60;
 export const GRID_MARGIN: [number, number] = [16, 16];
 export const LAYOUT_STORAGE_KEY = "factus_dashboard_layout";
-export const LAYOUT_VERSION = 1;
+export const LAYOUT_VERSION = 2;
 
 /** Widget metadata registry. */
 export const WIDGET_CONFIGS: Record<WidgetId, WidgetConfig> = {
@@ -79,6 +79,15 @@ export const WIDGET_CONFIGS: Record<WidgetId, WidgetConfig> = {
     category: "kpi",
     minW: 2,
     minH: 2,
+    defaultVisible: true,
+  },
+  "client-of-month": {
+    id: "client-of-month",
+    title: "Cliente del Mes",
+    description: "Cliente con mayor facturacion del mes",
+    category: "kpi",
+    minW: 3,
+    minH: 3,
     defaultVisible: true,
   },
   "chart-revenue": {
@@ -160,15 +169,17 @@ export const DEFAULT_LAYOUT_LG: GridLayoutItem[] = [
   { i: "kpi-branches", x: 3, y: 4, w: 3, h: 2, minW: 2, minH: 2 },
   { i: "kpi-company", x: 6, y: 4, w: 3, h: 2, minW: 2, minH: 2 },
   { i: "kpi-api", x: 9, y: 4, w: 3, h: 2, minW: 2, minH: 2 },
-  // Row 6-10: Charts row 1
-  { i: "chart-revenue", x: 0, y: 6, w: 6, h: 5, minW: 4, minH: 5 },
-  { i: "chart-invoices-bar", x: 6, y: 6, w: 6, h: 5, minW: 4, minH: 5 },
+  // Row 6-8: Client of the month
+  { i: "client-of-month", x: 0, y: 6, w: 4, h: 3, minW: 3, minH: 3 },
+  // Row 6-10: Charts row 1 (beside client-of-month)
+  { i: "chart-revenue", x: 4, y: 6, w: 4, h: 5, minW: 4, minH: 5 },
+  { i: "chart-invoices-bar", x: 8, y: 6, w: 4, h: 5, minW: 4, minH: 5 },
   // Row 11-15: Charts row 2
   { i: "chart-daily-revenue", x: 0, y: 11, w: 8, h: 5, minW: 4, minH: 5 },
   { i: "chart-status-pie", x: 8, y: 11, w: 4, h: 5, minW: 3, minH: 5 },
   // Row 16-20: Charts row 3
   { i: "chart-tax-vs-revenue", x: 0, y: 16, w: 12, h: 5, minW: 4, minH: 5 },
-  // Row 21-26: Data tables
+  // Row 21-27: Data tables
   { i: "table-recent-invoices", x: 0, y: 21, w: 7, h: 7, minW: 4, minH: 6 },
   { i: "table-top-clients", x: 7, y: 21, w: 5, h: 7, minW: 4, minH: 6 },
 ];
@@ -184,7 +195,8 @@ export const DEFAULT_LAYOUT_MD: GridLayoutItem[] = [
   { i: "kpi-branches", x: 5, y: 6, w: 5, h: 2, minW: 2, minH: 2 },
   { i: "kpi-company", x: 0, y: 8, w: 5, h: 2, minW: 2, minH: 2 },
   { i: "kpi-api", x: 5, y: 8, w: 5, h: 2, minW: 2, minH: 2 },
-  { i: "chart-revenue", x: 0, y: 10, w: 10, h: 5, minW: 4, minH: 5 },
+  { i: "client-of-month", x: 0, y: 10, w: 10, h: 3, minW: 3, minH: 3 },
+  { i: "chart-revenue", x: 0, y: 13, w: 10, h: 5, minW: 4, minH: 5 },
   { i: "chart-invoices-bar", x: 0, y: 15, w: 10, h: 5, minW: 4, minH: 5 },
   { i: "chart-daily-revenue", x: 0, y: 20, w: 10, h: 5, minW: 4, minH: 5 },
   { i: "chart-status-pie", x: 0, y: 25, w: 10, h: 5, minW: 3, minH: 5 },
@@ -204,7 +216,8 @@ export const DEFAULT_LAYOUT_SM: GridLayoutItem[] = [
   { i: "kpi-branches", x: 3, y: 6, w: 3, h: 2, minW: 2, minH: 2 },
   { i: "kpi-company", x: 0, y: 8, w: 3, h: 2, minW: 2, minH: 2 },
   { i: "kpi-api", x: 3, y: 8, w: 3, h: 2, minW: 2, minH: 2 },
-  { i: "chart-revenue", x: 0, y: 10, w: 6, h: 5, minW: 4, minH: 5 },
+  { i: "client-of-month", x: 0, y: 10, w: 6, h: 3, minW: 3, minH: 3 },
+  { i: "chart-revenue", x: 0, y: 13, w: 6, h: 5, minW: 4, minH: 5 },
   { i: "chart-invoices-bar", x: 0, y: 15, w: 6, h: 5, minW: 4, minH: 5 },
   { i: "chart-daily-revenue", x: 0, y: 20, w: 6, h: 5, minW: 4, minH: 5 },
   { i: "chart-status-pie", x: 0, y: 25, w: 6, h: 5, minW: 3, minH: 5 },
@@ -224,7 +237,8 @@ export const DEFAULT_LAYOUT_XS: GridLayoutItem[] = [
   { i: "kpi-branches", x: 0, y: 13, w: 2, h: 2, minW: 2, minH: 2 },
   { i: "kpi-company", x: 0, y: 15, w: 2, h: 2, minW: 2, minH: 2 },
   { i: "kpi-api", x: 0, y: 17, w: 2, h: 2, minW: 2, minH: 2 },
-  { i: "chart-revenue", x: 0, y: 19, w: 2, h: 5, minW: 2, minH: 5 },
+  { i: "client-of-month", x: 0, y: 19, w: 2, h: 3, minW: 2, minH: 3 },
+  { i: "chart-revenue", x: 0, y: 22, w: 2, h: 5, minW: 2, minH: 5 },
   { i: "chart-invoices-bar", x: 0, y: 24, w: 2, h: 5, minW: 2, minH: 5 },
   { i: "chart-daily-revenue", x: 0, y: 29, w: 2, h: 5, minW: 2, minH: 5 },
   { i: "chart-status-pie", x: 0, y: 34, w: 2, h: 5, minW: 2, minH: 5 },

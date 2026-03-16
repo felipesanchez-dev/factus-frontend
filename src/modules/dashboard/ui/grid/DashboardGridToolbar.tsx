@@ -9,6 +9,8 @@ import {
   Lock,
   Unlock,
   ChevronDown,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/shared/lib/cn";
 import { WIDGET_CONFIGS } from "./grid.constants";
@@ -20,6 +22,28 @@ interface DashboardGridToolbarProps {
   onReset: () => void;
   hiddenWidgets: WidgetId[];
   onToggleWidget: (id: WidgetId) => void;
+  lastUpdated: Date | null;
+  isRefreshing: boolean;
+  onRefresh: () => void;
+}
+
+function useTimeAgo(date: Date | null): string {
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!date) return;
+    const interval = window.setInterval(() => setTick((t) => t + 1), 1000);
+    return () => window.clearInterval(interval);
+  }, [date]);
+
+  if (!date) return "";
+
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 5) return "Justo ahora";
+  if (seconds < 60) return `Hace ${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `Hace ${minutes}m`;
+  return `Hace ${Math.floor(minutes / 60)}h`;
 }
 
 export function DashboardGridToolbar({
@@ -28,9 +52,13 @@ export function DashboardGridToolbar({
   onReset,
   hiddenWidgets,
   onToggleWidget,
+  lastUpdated,
+  isRefreshing,
+  onRefresh,
 }: DashboardGridToolbarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const timeAgo = useTimeAgo(lastUpdated);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -49,7 +77,7 @@ export function DashboardGridToolbar({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <h1 className="text-lg font-bold text-gray-900 dark:text-white">
           Dashboard
         </h1>
@@ -58,6 +86,26 @@ export function DashboardGridToolbar({
             {hiddenCount} oculto{hiddenCount > 1 ? "s" : ""}
           </span>
         )}
+        {/* Refresh indicator */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="rounded-md p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+            title="Actualizar datos"
+          >
+            {isRefreshing ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="h-3.5 w-3.5" />
+            )}
+          </button>
+          {timeAgo && (
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              {timeAgo}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

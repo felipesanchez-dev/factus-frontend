@@ -26,9 +26,11 @@ import { StatusPieChartWidget } from "./widgets/StatusPieChartWidget";
 import { TaxVsRevenueChartWidget } from "./widgets/TaxVsRevenueChartWidget";
 import { RecentInvoicesWidget } from "./widgets/RecentInvoicesWidget";
 import { TopClientsWidget } from "./widgets/TopClientsWidget";
+import { ClientOfMonthWidget } from "./widgets/ClientOfMonthWidget";
 
 export function DashboardOverview() {
-  const { data, loading, error } = useDashboard();
+  const { data, loading, error, lastUpdated, isRefreshing, refresh } =
+    useDashboard();
   const gridLayout = useGridLayout();
   const [selectedBill, setSelectedBill] = useState<string | null>(null);
   const [previewBill, setPreviewBill] = useState<string | null>(null);
@@ -110,6 +112,8 @@ export function DashboardOverview() {
             invoices={invoices}
           />
         );
+      case "client-of-month":
+        return <ClientOfMonthWidget {...common} />;
       case "chart-revenue":
         return <RevenueChartWidget {...common} data={invoices.monthlyData} />;
       case "chart-invoices-bar":
@@ -132,7 +136,6 @@ export function DashboardOverview() {
         return (
           <RecentInvoicesWidget
             {...common}
-            invoices={invoices.recentInvoices}
             onViewDetail={setSelectedBill}
             onPreview={setPreviewBill}
           />
@@ -154,6 +157,9 @@ export function DashboardOverview() {
         onReset={gridLayout.resetLayout}
         hiddenWidgets={gridLayout.hiddenWidgets}
         onToggleWidget={gridLayout.toggleWidget}
+        lastUpdated={lastUpdated}
+        isRefreshing={isRefreshing}
+        onRefresh={refresh}
       />
 
       <DashboardGrid

@@ -3,10 +3,8 @@
 import { FileText } from "lucide-react";
 import { WidgetWrapper } from "./WidgetWrapper";
 import { RecentInvoicesTable } from "../RecentInvoicesTable";
-import type { RecentInvoice } from "../../domain/dashboard.types";
 
 interface Props {
-  invoices: RecentInvoice[];
   isEditing: boolean;
   onRemove?: () => void;
   onViewDetail: (billNumber: string) => void;
@@ -14,7 +12,6 @@ interface Props {
 }
 
 export function RecentInvoicesWidget({
-  invoices,
   isEditing,
   onRemove,
   onViewDetail,
@@ -31,7 +28,6 @@ export function RecentInvoicesWidget({
     >
       <div className="h-full overflow-auto px-2 pb-2">
         <RecentInvoicesTable
-          invoices={invoices}
           onViewDetail={onViewDetail}
           onPreview={onPreview}
         />

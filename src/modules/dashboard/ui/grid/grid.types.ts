@@ -23,6 +23,7 @@ export type WidgetId =
   | "kpi-branches"
   | "kpi-company"
   | "kpi-api"
+  | "client-of-month"
   | "chart-revenue"
   | "chart-invoices-bar"
   | "chart-daily-revenue"

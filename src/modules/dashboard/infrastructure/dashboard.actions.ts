@@ -12,6 +12,9 @@ import type {
   MonthlyData,
   TopClient,
   BillDetail,
+  InvoicePageParams,
+  InvoicePageResult,
+  ClientOfMonth,
 } from "../domain/dashboard.types";
 
 interface UserData {
@@ -541,6 +544,98 @@ export async function getBillDetailAction(
     const factus = await getFactusClient();
     const detail = await factus.bills.show(billNumber);
     return detail as unknown as BillDetail;
+  } catch {
+    return null;
+  }
+}
+
+// ---- Server-side paginated invoice listing ----
+
+export async function listInvoicesPageAction(
+  params: InvoicePageParams,
+): Promise<InvoicePageResult> {
+  try {
+    const factus = await getFactusClient();
+    const result = await factus.bills.list({
+      page: params.page ?? 1,
+      identification: params.identification || undefined,
+      names: params.names || undefined,
+      number: params.number || undefined,
+      reference_code: params.reference_code || undefined,
+      status: params.status,
+    });
+
+    const invoices = result.data.map(mapBillToRecentInvoice);
+
+    return {
+      invoices,
+      pagination: {
+        total: result.pagination.total,
+        perPage: result.pagination.perPage,
+        currentPage: result.pagination.currentPage,
+        lastPage: result.pagination.lastPage,
+      },
+    };
+  } catch {
+    return {
+      invoices: [],
+      pagination: { total: 0, perPage: 10, currentPage: 1, lastPage: 1 },
+    };
+  }
+}
+
+// ---- Client of the month ----
+
+export async function getClientOfMonthAction(): Promise<ClientOfMonth | null> {
+  try {
+    const factus = await getFactusClient();
+    const bills = await fetchBillsWithLimit(factus, 20); // 200 bills
+
+    const threshold = getDateThreshold("month");
+    const clientMap = new Map<
+      string,
+      { name: string; document: string; total: number; count: number }
+    >();
+    let totalRevenue = 0;
+
+    for (const bill of bills) {
+      const dateStr: string = bill.created_at || "";
+      const date = parseFactusDate(dateStr);
+      if (threshold && date && date < threshold) continue;
+
+      const total = parseFloat(String(bill.total ?? "0"));
+      totalRevenue += total;
+
+      const clientName =
+        bill.graphic_representation_name || bill.names || "Cliente";
+      const clientDoc = bill.identification || "";
+      const clientKey = clientDoc || clientName;
+
+      const existing = clientMap.get(clientKey) || {
+        name: clientName,
+        document: clientDoc,
+        total: 0,
+        count: 0,
+      };
+      existing.total += total;
+      existing.count += 1;
+      clientMap.set(clientKey, existing);
+    }
+
+    if (clientMap.size === 0 || totalRevenue === 0) return null;
+
+    const sorted = Array.from(clientMap.values()).sort(
+      (a, b) => b.total - a.total,
+    );
+    const top = sorted[0];
+
+    return {
+      name: top.name,
+      document: top.document,
+      total: Math.round(top.total),
+      count: top.count,
+      percentOfTotal: Math.round((top.total / totalRevenue) * 100),
+    };
   } catch {
     return null;
   }

@@ -63,6 +63,35 @@ export interface DashboardData {
   invoices: InvoiceMetrics;
 }
 
+// ---- Server-side pagination types ----
+
+export interface InvoicePageParams {
+  page?: number;
+  identification?: string;
+  names?: string;
+  number?: string;
+  reference_code?: string;
+  status?: 0 | 1 | 2;
+}
+
+export interface InvoicePageResult {
+  invoices: RecentInvoice[];
+  pagination: {
+    total: number;
+    perPage: number;
+    currentPage: number;
+    lastPage: number;
+  };
+}
+
+export interface ClientOfMonth {
+  name: string;
+  document: string;
+  total: number;
+  count: number;
+  percentOfTotal: number;
+}
+
 // ---- Bill Detail Types (from /v1/bills/show/{number}) ----
 
 export interface BillDetailCompany {
