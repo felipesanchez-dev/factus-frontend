@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "react-grid-layout/css/styles.css";
+@import "react-resizable/css/styles.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -42,4 +44,30 @@ html.transitioning *::after {
 }
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
+}
+
+/* react-grid-layout overrides */
+.react-grid-placeholder {
+  background-color: rgb(59 130 246 / 0.12) !important;
+  border: 2px dashed rgb(59 130 246 / 0.35) !important;
+  border-radius: 0.75rem !important;
+}
+
+.dark .react-grid-placeholder {
+  background-color: rgb(59 130 246 / 0.08) !important;
+  border-color: rgb(59 130 246 / 0.25) !important;
+}
+
+.react-grid-item > .react-resizable-handle {
+  display: none;
+}
+
+.dashboard-grid-editing .react-grid-item > .react-resizable-handle {
+  display: block;
+}
+
+.react-grid-item.react-draggable-dragging {
+  z-index: 100;
+  opacity: 0.9;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
