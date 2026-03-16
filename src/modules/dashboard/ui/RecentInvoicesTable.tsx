@@ -10,6 +10,9 @@ import {
   Loader2,
   Search,
   X,
+  Filter,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Card } from "@/shared/components/Card";
 import { Badge } from "@/shared/components/Badge";
@@ -44,6 +47,8 @@ const STATUS_OPTIONS: { label: string; value: 0 | 1 | 2 | undefined }[] = [
   { label: "Rechazada", value: 2 },
 ];
 
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
+
 const REFRESH_INTERVAL_MS = 10_000;
 const DEBOUNCE_MS = 500;
 
@@ -66,52 +71,103 @@ export function RecentInvoicesTable({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Filters
-  const [searchText, setSearchText] = useState("");
+  // Advanced filters
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [quickSearch, setQuickSearch] = useState("");
+  const [filterIdentification, setFilterIdentification] = useState("");
+  const [filterNames, setFilterNames] = useState("");
+  const [filterNumber, setFilterNumber] = useState("");
+  const [filterPrefix, setFilterPrefix] = useState("");
+  const [filterReferenceCode, setFilterReferenceCode] = useState("");
   const [statusFilter, setStatusFilter] = useState<0 | 1 | 2 | undefined>(
     undefined,
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const isFetchingRef = useRef(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Debounce search text
+  // Debounced versions of filter values
+  const [debouncedQuickSearch, setDebouncedQuickSearch] = useState("");
+  const [debouncedIdentification, setDebouncedIdentification] = useState("");
+  const [debouncedNames, setDebouncedNames] = useState("");
+  const [debouncedNumber, setDebouncedNumber] = useState("");
+  const [debouncedPrefix, setDebouncedPrefix] = useState("");
+  const [debouncedReferenceCode, setDebouncedReferenceCode] = useState("");
+
+  // Debounce all text filters
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(searchText);
+      setDebouncedQuickSearch(quickSearch);
+      setDebouncedIdentification(filterIdentification);
+      setDebouncedNames(filterNames);
+      setDebouncedNumber(filterNumber);
+      setDebouncedPrefix(filterPrefix);
+      setDebouncedReferenceCode(filterReferenceCode);
       setCurrentPage(1);
     }, DEBOUNCE_MS);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [searchText]);
+  }, [
+    quickSearch,
+    filterIdentification,
+    filterNames,
+    filterNumber,
+    filterPrefix,
+    filterReferenceCode,
+  ]);
 
-  // Reset page on status change
+  // Reset page on status or pageSize change
   useEffect(() => {
     setCurrentPage(1);
-  }, [statusFilter]);
+  }, [statusFilter, pageSize]);
 
   // Build filter params
   const filterParams = useMemo((): InvoicePageParams => {
     const params: InvoicePageParams = {
       page: currentPage,
+      perPage: pageSize,
       status: statusFilter,
     };
 
-    const text = debouncedSearch.trim();
-    if (text) {
-      if (/^\d+$/.test(text)) {
-        params.identification = text;
-      } else {
-        params.names = text;
+    // If advanced filters are open, use individual fields
+    if (showAdvancedFilters) {
+      if (debouncedIdentification.trim())
+        params.identification = debouncedIdentification.trim();
+      if (debouncedNames.trim()) params.names = debouncedNames.trim();
+      if (debouncedNumber.trim()) params.number = debouncedNumber.trim();
+      if (debouncedPrefix.trim()) params.prefix = debouncedPrefix.trim();
+      if (debouncedReferenceCode.trim())
+        params.reference_code = debouncedReferenceCode.trim();
+    } else {
+      // Quick search: detect if it looks like a document/NIT (digits, dots, dashes)
+      const text = debouncedQuickSearch.trim();
+      if (text) {
+        const cleaned = text.replace(/[\s.\-]/g, "");
+        if (/^\d+$/.test(cleaned)) {
+          params.identification = cleaned;
+        } else {
+          params.names = text;
+        }
       }
     }
 
     return params;
-  }, [currentPage, statusFilter, debouncedSearch]);
+  }, [
+    currentPage,
+    pageSize,
+    statusFilter,
+    showAdvancedFilters,
+    debouncedQuickSearch,
+    debouncedIdentification,
+    debouncedNames,
+    debouncedNumber,
+    debouncedPrefix,
+    debouncedReferenceCode,
+  ]);
 
   // Fetch invoices
   const fetchInvoices = useCallback(
@@ -147,65 +203,120 @@ export function RecentInvoicesTable({
     return () => window.clearInterval(interval);
   }, [fetchInvoices]);
 
-  const hasFilters = debouncedSearch !== "" || statusFilter !== undefined;
+  const hasFilters =
+    debouncedQuickSearch !== "" ||
+    debouncedIdentification !== "" ||
+    debouncedNames !== "" ||
+    debouncedNumber !== "" ||
+    debouncedPrefix !== "" ||
+    debouncedReferenceCode !== "" ||
+    statusFilter !== undefined;
 
-  const from =
-    pagination.total === 0
-      ? 0
-      : (pagination.currentPage - 1) * pagination.perPage + 1;
-  const to = Math.min(
-    pagination.currentPage * pagination.perPage,
-    pagination.total,
-  );
+  const totalItems = pagination.total;
+  const perPage = pagination.perPage || 10;
+  const from = totalItems === 0 ? 0 : (pagination.currentPage - 1) * perPage + 1;
+  const to = Math.min(pagination.currentPage * perPage, totalItems);
 
   function clearFilters() {
-    setSearchText("");
-    setDebouncedSearch("");
+    setQuickSearch("");
+    setDebouncedQuickSearch("");
+    setFilterIdentification("");
+    setDebouncedIdentification("");
+    setFilterNames("");
+    setDebouncedNames("");
+    setFilterNumber("");
+    setDebouncedNumber("");
+    setFilterPrefix("");
+    setDebouncedPrefix("");
+    setFilterReferenceCode("");
+    setDebouncedReferenceCode("");
     setStatusFilter(undefined);
     setCurrentPage(1);
   }
+
+  const inputClass =
+    "w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20";
 
   return (
     <Card>
       {/* Header + Filters */}
       <div className="mb-4 space-y-3">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-              Facturas Recientes
-            </h3>
-            <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
-              {pagination.total.toLocaleString("es-CO")} facturas en total
-              {refreshing && (
-                <>
-                  <span>&middot;</span>
-                  <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
-                </>
-              )}
-            </p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                Facturas Recientes
+              </h3>
+              <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
+                {totalItems.toLocaleString("es-CO")} facturas en total
+                {refreshing && (
+                  <>
+                    <span>&middot;</span>
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+                  </>
+                )}
+              </p>
+            </div>
+
+            {/* Page size selector */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                Mostrar:
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-1.5 py-0.5 text-xs text-gray-700 dark:text-gray-300 focus:border-blue-500 focus:outline-none"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              showAdvancedFilters
+                ? "bg-blue-600 text-white shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700"
+            }`}
+          >
+            <Filter className="h-3.5 w-3.5" />
+            Filtros Avanzados
+            {showAdvancedFilters ? (
+              <ChevronUp className="h-3 w-3" />
+            ) : (
+              <ChevronDown className="h-3 w-3" />
+            )}
+          </button>
         </div>
 
-        {/* Filter bar */}
+        {/* Quick search + Status (always visible) */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-            <input
-              type="text"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Buscar por nombre o documento..."
-              className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-8 pr-8 py-1.5 text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-            />
-            {searchText && (
-              <button
-                onClick={() => setSearchText("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
+          {!showAdvancedFilters && (
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <input
+                type="text"
+                value={quickSearch}
+                onChange={(e) => setQuickSearch(e.target.value)}
+                placeholder="Buscar por nombre o documento..."
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-8 pr-8 py-1.5 text-xs text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+              />
+              {quickSearch && (
+                <button
+                  onClick={() => setQuickSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-1">
             {STATUS_OPTIONS.map((opt) => (
@@ -232,6 +343,94 @@ export function RecentInvoicesTable({
             </button>
           )}
         </div>
+
+        {/* Advanced filter panel */}
+        {showAdvancedFilters && (
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Identificacion / NIT
+                </label>
+                <input
+                  type="text"
+                  value={filterIdentification}
+                  onChange={(e) => setFilterIdentification(e.target.value)}
+                  placeholder="Ej: 900123456"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Nombre del Cliente
+                </label>
+                <input
+                  type="text"
+                  value={filterNames}
+                  onChange={(e) => setFilterNames(e.target.value)}
+                  placeholder="Ej: Juan Perez"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  No. Factura
+                </label>
+                <input
+                  type="text"
+                  value={filterNumber}
+                  onChange={(e) => setFilterNumber(e.target.value)}
+                  placeholder="Ej: 1234"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Prefijo
+                </label>
+                <input
+                  type="text"
+                  value={filterPrefix}
+                  onChange={(e) => setFilterPrefix(e.target.value)}
+                  placeholder="Ej: SETT"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Codigo de Referencia
+                </label>
+                <input
+                  type="text"
+                  value={filterReferenceCode}
+                  onChange={(e) => setFilterReferenceCode(e.target.value)}
+                  placeholder="Ej: REF-001"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Estado
+                </label>
+                <select
+                  value={statusFilter === undefined ? "" : String(statusFilter)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setStatusFilter(
+                      v === "" ? undefined : (Number(v) as 0 | 1 | 2),
+                    );
+                  }}
+                  className={inputClass}
+                >
+                  <option value="">Todos</option>
+                  <option value="1">Validada</option>
+                  <option value="0">Pendiente</option>
+                  <option value="2">Rechazada</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Table */}
@@ -351,7 +550,7 @@ export function RecentInvoicesTable({
           {/* Pagination Footer */}
           <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-3 mt-3">
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              {from}-{to} de {pagination.total.toLocaleString("es-CO")} facturas
+              {from}-{to} de {totalItems.toLocaleString("es-CO")} facturas
             </p>
 
             <div className="flex items-center gap-1">

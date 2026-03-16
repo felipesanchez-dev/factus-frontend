@@ -67,9 +67,11 @@ export interface DashboardData {
 
 export interface InvoicePageParams {
   page?: number;
+  perPage?: number;
   identification?: string;
   names?: string;
   number?: string;
+  prefix?: string;
   reference_code?: string;
   status?: 0 | 1 | 2;
 }

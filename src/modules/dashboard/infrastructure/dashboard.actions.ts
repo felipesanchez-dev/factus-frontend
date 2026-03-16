@@ -551,35 +551,82 @@ export async function getBillDetailAction(
 
 // ---- Server-side paginated invoice listing ----
 
+const API_PAGE_SIZE = 10; // Factus API always returns 10 per page
+
 export async function listInvoicesPageAction(
   params: InvoicePageParams,
 ): Promise<InvoicePageResult> {
   try {
     const factus = await getFactusClient();
-    const result = await factus.bills.list({
-      page: params.page ?? 1,
+    const wantedPage = params.page ?? 1;
+    const wantedPerPage = params.perPage ?? API_PAGE_SIZE;
+
+    const filterOpts = {
       identification: params.identification || undefined,
       names: params.names || undefined,
       number: params.number || undefined,
+      prefix: params.prefix || undefined,
       reference_code: params.reference_code || undefined,
       status: params.status,
-    });
+    };
 
-    const invoices = result.data.map(mapBillToRecentInvoice);
+    // If the wanted page size matches the API page size, do a single fetch
+    if (wantedPerPage === API_PAGE_SIZE) {
+      const result = await factus.bills.list({ page: wantedPage, ...filterOpts });
+      return {
+        invoices: result.data.map(mapBillToRecentInvoice),
+        pagination: {
+          total: result.pagination.total,
+          perPage: wantedPerPage,
+          currentPage: wantedPage,
+          lastPage: result.pagination.lastPage,
+        },
+      };
+    }
+
+    // Map virtual page → API pages
+    // Virtual item range: [(wantedPage-1)*wantedPerPage, wantedPage*wantedPerPage)
+    const startItem = (wantedPage - 1) * wantedPerPage; // 0-indexed
+    const endItem = startItem + wantedPerPage; // exclusive
+
+    const firstApiPage = Math.floor(startItem / API_PAGE_SIZE) + 1;
+    const lastApiPage = Math.ceil(endItem / API_PAGE_SIZE);
+
+    // Fetch all needed API pages in parallel
+    const apiPages: number[] = [];
+    for (let p = firstApiPage; p <= lastApiPage; p++) apiPages.push(p);
+
+    const results = await Promise.all(
+      apiPages.map((p) => factus.bills.list({ page: p, ...filterOpts })),
+    );
+
+    // Combine all bills and get total from first result
+    const allBills: BillSummary[] = [];
+    let apiTotal = 0;
+    for (const result of results) {
+      allBills.push(...result.data);
+      apiTotal = result.pagination.total;
+    }
+
+    // Slice to the correct window
+    const offsetInBatch = startItem - (firstApiPage - 1) * API_PAGE_SIZE;
+    const sliced = allBills.slice(offsetInBatch, offsetInBatch + wantedPerPage);
+
+    const totalPages = Math.ceil(apiTotal / wantedPerPage);
 
     return {
-      invoices,
+      invoices: sliced.map(mapBillToRecentInvoice),
       pagination: {
-        total: result.pagination.total,
-        perPage: result.pagination.perPage,
-        currentPage: result.pagination.currentPage,
-        lastPage: result.pagination.lastPage,
+        total: apiTotal,
+        perPage: wantedPerPage,
+        currentPage: wantedPage,
+        lastPage: totalPages,
       },
     };
   } catch {
     return {
       invoices: [],
-      pagination: { total: 0, perPage: 10, currentPage: 1, lastPage: 1 },
+      pagination: { total: 0, perPage: params.perPage ?? 10, currentPage: 1, lastPage: 1 },
     };
   }
 }
