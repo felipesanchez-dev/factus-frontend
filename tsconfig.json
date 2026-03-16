@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "factus-sdk": ["../factus-sdk/src/index"]
     }
   },
   "include": [

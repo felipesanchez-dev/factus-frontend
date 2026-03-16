@@ -1,0 +1,36 @@
+[
+  {
+    "id": "sale_mms7bckr_00p6m",
+    "branchId": "br_mlwxqt6e_028aj",
+    "sellerId": "usr_mlx33s4j_yr4a9",
+    "sellerName": "Factus Vendedor",
+    "billNumber": "SETP990026245",
+    "referenceCode": "VTA-MMS7BAQG",
+    "cufe": "29df8c3bf8262898cc7e964576df5cb5ee4f1124b7a1fb99f313d8da259f2b9fbcd6447b48680e696a83b196c96773d0",
+    "publicUrl": "http://app-sandbox.factus.com.co/documents/bills/49b4d7ee055936a459640ff77ec3fb19d2f0d9be5ed15d002f40a017a131ab42",
+    "customerName": "Juan Felipe Reyes Sanchez",
+    "customerIdentification": "1105461659",
+    "items": [
+      {
+        "productId": "prod_mlwyrjds_pea5j",
+        "code": "COD01",
+        "name": "MacBook Air de 15 pulgadas",
+        "quantity": 1,
+        "price": 7399000,
+        "taxRate": 19,
+        "discountRate": 0,
+        "subtotal": 7399000,
+        "taxAmount": 1405810,
+        "total": 8804810
+      }
+    ],
+    "subtotal": 7399000,
+    "taxTotal": 1405810,
+    "discountTotal": 0,
+    "total": 7399000,
+    "paymentForm": "Contado",
+    "paymentMethod": "Efectivo",
+    "status": "validada",
+    "createdAt": "2026-03-15T20:22:41.260Z"
+  }
+]

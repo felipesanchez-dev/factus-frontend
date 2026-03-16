@@ -1,0 +1,68 @@
+{
+  "super_admin": {
+    "label": "Super Admin",
+    "areas": [
+      "dashboard",
+      "empresa",
+      "productos",
+      "facturacion",
+      "usuarios",
+      "sucursales",
+      "metricas",
+      "configuracion",
+      "tienda"
+    ],
+    "permissions": [
+      "read",
+      "write",
+      "delete"
+    ],
+    "branchScoped": false,
+    "homePage": "dashboard"
+  },
+  "admin_sucursal": {
+    "label": "Admin Sucursal",
+    "areas": [
+      "dashboard",
+      "productos",
+      "facturacion",
+      "metricas",
+      "empresa",
+      "usuarios",
+      "sucursales",
+      "configuracion"
+    ],
+    "permissions": [
+      "read",
+      "write"
+    ],
+    "branchScoped": true,
+    "homePage": "dashboard"
+  },
+  "vendedor": {
+    "label": "Vendedor",
+    "areas": [
+      "productos",
+      "facturacion",
+      "tienda"
+    ],
+    "permissions": [
+      "read",
+      "write"
+    ],
+    "branchScoped": true,
+    "homePage": "tienda"
+  },
+  "visor": {
+    "label": "Visor",
+    "areas": [
+      "dashboard",
+      "metricas"
+    ],
+    "permissions": [
+      "read"
+    ],
+    "branchScoped": true,
+    "homePage": "dashboard"
+  }
+}

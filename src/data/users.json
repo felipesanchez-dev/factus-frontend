@@ -1,0 +1,26 @@
+[
+  {
+    "id": "usr_001",
+    "username": "admin",
+    "password": "61e31ed12ae7d0a5e30d62eac162c240:8d1cee6ce5b583fc4c11948d30a2ab9fbf26033d45b7dce092d073c4fd65cf66102b99fd056a4e0964850bdbb5ea9e12370a74fb382dbf7e5b30c9fb534f3e7b",
+    "fullName": "Administrador Principal",
+    "email": "admin@factus.com",
+    "role": "super_admin",
+    "branchId": null,
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "usr_mlx33s4j_yr4a9",
+    "username": "factus.vendedor",
+    "password": "d3cd0fbba065adb170c79279ae7039db:9bd7c05c4131b7698da6c5d80f1499b054116bf8d545bab668b63d6a72b0f9146f44d317b187fdd3c311d7d6304bba108a136f5b63fddaf7698e590d12863a7c",
+    "fullName": "Factus Vendedor",
+    "email": "factus.vendedor@gmail.com",
+    "role": "vendedor",
+    "branchId": "br_mlwxqt6e_028aj",
+    "isActive": true,
+    "createdAt": "2026-02-22T01:43:58.242Z",
+    "updatedAt": "2026-03-15T19:56:30.876Z"
+  }
+]

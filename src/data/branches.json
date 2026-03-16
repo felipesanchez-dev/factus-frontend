@@ -1,0 +1,15 @@
+[
+  {
+    "id": "br_mlwxqt6e_028aj",
+    "name": "Reto Factus",
+    "address": "calle 160 # 21 sur 19",
+    "phone": "3102452542",
+    "city": "Ibague, Tolima",
+    "municipalityCode": "73001",
+    "isActive": true,
+    "createdAt": "2026-02-21T23:13:54.997Z",
+    "updatedAt": "2026-02-22T00:57:31.943Z",
+    "latitude": 4.389406028255487,
+    "longitude": -75.1374485488684
+  }
+]

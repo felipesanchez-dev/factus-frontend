@@ -1,0 +1,20 @@
+{
+  "id": "comp_001",
+  "name": "Reto Factus",
+  "description": "Reto Factus",
+  "nit": "1105461659-1",
+  "address": "calle 160 # 21 sur 19",
+  "phone": "3102452542",
+  "email": "jfelipe9.121@gmail.com",
+  "logoUrl": "https://res.cloudinary.com/dlndfeezj/image/upload/v1771723554/retofactus/logos/company-logo.png",
+  "industry": "Tecnologia",
+  "city": "Ibague",
+  "website": "https://felipesanchezdev.site",
+  "legalRepresentative": "Felipe Reyes Sanchez",
+  "companySize": "",
+  "branchCount": 1,
+  "employeeCount": 5,
+  "foundedYear": 2026,
+  "createdAt": "2026-02-21T23:14:53.843Z",
+  "updatedAt": "2026-02-22T01:25:56.493Z"
+}

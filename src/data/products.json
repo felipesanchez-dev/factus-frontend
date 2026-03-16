@@ -1,0 +1,19 @@
+[
+  {
+    "id": "prod_mlwyrjds_pea5j",
+    "branchId": "br_mlwxqt6e_028aj",
+    "code": "COD01",
+    "name": "MacBook Air de 15 pulgadas",
+    "description": " El chip M3 llega al MacBook Air de 15 pulgadas para potenciar lo que este laptop superportátil es capaz de hacer. Y como ofrece hasta 18 horas de batería, podrás arrasar en cualquier tarea o jugar sin interrupciones donde sea que estés.",
+    "image": "https://res.cloudinary.com/dlndfeezj/image/upload/v1771723522/retofactus/products/prod_mlwyrjds_pea5j.png",
+    "price": 7399000,
+    "taxRate": 19,
+    "discount": 0,
+    "discountRate": 0,
+    "stock": 99,
+    "unitMeasure": "Unidad",
+    "isActive": true,
+    "createdAt": "2026-02-21T23:42:28.575Z",
+    "updatedAt": "2026-03-15T20:22:41.264Z"
+  }
+]
