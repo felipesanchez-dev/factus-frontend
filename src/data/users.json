@@ -14,13 +14,13 @@
   {
     "id": "usr_mlx33s4j_yr4a9",
     "username": "factus.vendedor",
-    "password": "d3cd0fbba065adb170c79279ae7039db:9bd7c05c4131b7698da6c5d80f1499b054116bf8d545bab668b63d6a72b0f9146f44d317b187fdd3c311d7d6304bba108a136f5b63fddaf7698e590d12863a7c",
+    "password": "30a86fbdf2faec77ca98369083abd8af:c171e4084503a1590b9a08b3ebe094b4df757fd5f39f17ff825da72c1e67256f28e2ea05c0e838886fe35f145cd7e22ff54fca9148f10b302d3ac273f2532372",
     "fullName": "Factus Vendedor",
     "email": "factus.vendedor@gmail.com",
     "role": "vendedor",
     "branchId": "br_mlwxqt6e_028aj",
     "isActive": true,
     "createdAt": "2026-02-22T01:43:58.242Z",
-    "updatedAt": "2026-03-15T19:56:30.876Z"
+    "updatedAt": "2026-03-16T03:37:31.312Z"
   }
 ]

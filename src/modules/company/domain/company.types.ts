@@ -54,3 +54,20 @@ export interface UploadLogoResponse {
   error?: string;
   logoUrl?: string;
 }
+
+export interface SyncCompanyToFactusResponse {
+  success: boolean;
+  error?: string;
+  companyName?: string;
+}
+
+export interface FactusCompanyInfo {
+  name: string;
+  nit: string;
+  email: string;
+  phone: string;
+  address: string;
+  municipality: string;
+  legalOrganization: string;
+  graphicRepresentationName: string;
+}

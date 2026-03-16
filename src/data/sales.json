@@ -32,5 +32,73 @@
     "paymentMethod": "Efectivo",
     "status": "validada",
     "createdAt": "2026-03-15T20:22:41.260Z"
+  },
+  {
+    "id": "sale_mmsn1c5y_3qnve",
+    "branchId": "br_mlwxqt6e_028aj",
+    "sellerId": "usr_mlx33s4j_yr4a9",
+    "sellerName": "Factus Vendedor",
+    "billNumber": "SETP990026268",
+    "referenceCode": "VTA-MMSN1A7A",
+    "cufe": "d9352b64947d9d1c20bd81bd90db826019be7fcfb4504a98404fc840cac4c43285849df252e43fee85d1afd7bea1dca6",
+    "publicUrl": "http://app-sandbox.factus.com.co/documents/bills/ee33b4b8772d290d2988bce7cd53e3297c9a81479bfcc31b869f3fec25dc96c5",
+    "customerName": "Juan Felipe Reyes Sanchez",
+    "customerIdentification": "1105461659",
+    "items": [
+      {
+        "productId": "prod_mlwyrjds_pea5j",
+        "code": "COD01",
+        "name": "MacBook Air de 15 pulgadas",
+        "quantity": 1,
+        "price": 7399000,
+        "taxRate": 19,
+        "discountRate": 0,
+        "subtotal": 7399000,
+        "taxAmount": 1405810,
+        "total": 8804810
+      }
+    ],
+    "subtotal": 7399000,
+    "taxTotal": 1405810,
+    "discountTotal": 0,
+    "total": 7399000,
+    "paymentForm": "Contado",
+    "paymentMethod": "Efectivo",
+    "status": "validada",
+    "createdAt": "2026-03-16T03:42:48.022Z"
+  },
+  {
+    "id": "sale_mmsn3yhm_z0j0m",
+    "branchId": "br_mlwxqt6e_028aj",
+    "sellerId": "usr_mlx33s4j_yr4a9",
+    "sellerName": "Factus Vendedor",
+    "billNumber": "SETP990026270",
+    "referenceCode": "VTA-MMSN3WF2",
+    "cufe": "b8d295480b15decd222490d5357598fe9b239be381303e2d3532bc975a7f1963331a894c38568ce229e0756611c0f9ed",
+    "publicUrl": "http://app-sandbox.factus.com.co/documents/bills/017942e87dda005cde6fb75ca2bf02c78e1dccf72d9db276d0439791619b4c1e",
+    "customerName": "Juan Felipe Reyes Sanchez",
+    "customerIdentification": "1105461659",
+    "items": [
+      {
+        "productId": "prod_mlwyrjds_pea5j",
+        "code": "COD01",
+        "name": "MacBook Air de 15 pulgadas",
+        "quantity": 96,
+        "price": 7399000,
+        "taxRate": 19,
+        "discountRate": 0,
+        "subtotal": 710304000,
+        "taxAmount": 134957760,
+        "total": 845261760
+      }
+    ],
+    "subtotal": 710304000,
+    "taxTotal": 134957760,
+    "discountTotal": 0,
+    "total": 710304000,
+    "paymentForm": "Contado",
+    "paymentMethod": "Efectivo",
+    "status": "validada",
+    "createdAt": "2026-03-16T03:44:50.266Z"
   }
 ]

@@ -2,7 +2,16 @@
 
 import { readJsonFile, writeJsonFile } from "@/shared/lib/json-storage";
 import { cloudinary } from "@/shared/lib/cloudinary";
-import type { Company, UpdateCompanyRequest, UpdateCompanyResponse, UploadLogoRequest, UploadLogoResponse } from "../domain/company.types";
+import { getFactusClient } from "@/shared/lib/factus-auth";
+import type {
+  Company,
+  UpdateCompanyRequest,
+  UpdateCompanyResponse,
+  UploadLogoRequest,
+  UploadLogoResponse,
+  SyncCompanyToFactusResponse,
+  FactusCompanyInfo,
+} from "../domain/company.types";
 
 const COMPANY_SIZES: Company["companySize"][] = [
   "",
@@ -113,6 +122,92 @@ export async function uploadLogoAction(data: UploadLogoRequest): Promise<UploadL
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error al subir logo",
+    };
+  }
+}
+
+// ── Factus Company Sync ─────────────────────────────────────────────
+
+export async function getFactusCompanyAction(): Promise<FactusCompanyInfo | null> {
+  try {
+    const factus = await getFactusClient();
+    const data = await factus.company.show();
+    return {
+      name: data.company || data.graphic_representation_name || `${data.names} ${data.surnames}`.trim(),
+      nit: `${data.nit}-${data.dv}`,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      municipality: data.municipality?.name
+        ? `${data.municipality.name}, ${data.municipality.department?.name || ""}`
+        : "",
+      legalOrganization: data.legal_organization?.name || "",
+      graphicRepresentationName: data.graphic_representation_name,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function syncCompanyToFactusAction(): Promise<SyncCompanyToFactusResponse> {
+  try {
+    const company = await getCompanyAction();
+
+    if (!company.name || !company.email) {
+      return {
+        success: false,
+        error: "Configure el nombre y email de la empresa antes de sincronizar.",
+      };
+    }
+
+    const factus = await getFactusClient();
+
+    // Look up municipality code by city name
+    let municipalityCode = "11001"; // Default: Bogotá
+    if (company.city) {
+      try {
+        const municipalities = await factus.catalogs.municipalities();
+        const cityNorm = company.city.trim().toLowerCase();
+        const match = municipalities.find(
+          (m) => m.name.toLowerCase() === cityNorm,
+        );
+        if (match) {
+          municipalityCode = match.code;
+        }
+      } catch {
+        // Keep default if catalog lookup fails
+      }
+    }
+
+    // Split legalRepresentative into names/surnames for persona natural
+    const repParts = (company.legalRepresentative || "").trim().split(/\s+/);
+    const repNames = repParts.slice(0, Math.ceil(repParts.length / 2)).join(" ") || null;
+    const repSurnames = repParts.slice(Math.ceil(repParts.length / 2)).join(" ") || null;
+
+    await factus.company.update({
+      legal_organization_code: "1", // Persona jurídica
+      company: company.name,
+      trade_name: company.name,
+      names: repNames,
+      surnames: repSurnames,
+      registration_code: null,
+      economic_activity: "6920",
+      phone: company.phone || "0000000000",
+      email: company.email,
+      address: company.address || "Sin dirección",
+      tribute_code: "ZZ",
+      municipality_code: municipalityCode,
+      responsibilities: "5",
+    });
+
+    return {
+      success: true,
+      companyName: company.name,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error al sincronizar con Factus",
     };
   }
 }

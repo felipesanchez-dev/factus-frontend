@@ -10,10 +10,27 @@
     "taxRate": 19,
     "discount": 0,
     "discountRate": 0,
-    "stock": 99,
+    "stock": 100,
     "unitMeasure": "Unidad",
     "isActive": true,
     "createdAt": "2026-02-21T23:42:28.575Z",
-    "updatedAt": "2026-03-15T20:22:41.264Z"
+    "updatedAt": "2026-03-16T03:50:09.451Z"
+  },
+  {
+    "id": "prod_mmsncvi0_tho7q",
+    "branchId": "br_mlwxqt6e_028aj",
+    "code": "COD02",
+    "name": "iPhone 17 Pro Max 256GB 5G Plata",
+    "description": "El iPhone 17 Pro Max redefine lo extraordinario. Su pantalla inmersiva de 6,86″ deslumbra en cada detalle y el Ceramic Shield 2 brinda hasta 3 veces más resistencia. El chip A19 Pro potencia Apple Intelligence, juegos y productividad. Sus cámaras avanzadas llevan la creación de contenido y el video profesional a otro nivel, con calidad cinematográfica en tu bolsillo. Con hasta 37 horas de video y velocidad 5G, nada te detiene. ¿Quieres el tuyo? Consíguelo aquí.",
+    "image": "https://res.cloudinary.com/dlndfeezj/image/upload/v1773633109/retofactus/products/prod_mmsncvi0_tho7q.webp",
+    "price": 6878010,
+    "taxRate": 19,
+    "discount": 0,
+    "discountRate": 0,
+    "stock": 100,
+    "unitMeasure": "Unidad",
+    "isActive": true,
+    "createdAt": "2026-03-16T03:51:46.296Z",
+    "updatedAt": "2026-03-16T03:51:48.678Z"
   }
 ]

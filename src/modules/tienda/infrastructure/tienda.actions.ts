@@ -76,12 +76,14 @@ export async function createInvoiceAction(data: CreateInvoiceInput): Promise<Inv
     }
 
     const referenceCode = `VTA-${Date.now().toString(36).toUpperCase()}`;
+    // Use Colombia timezone (UTC-5) to avoid UTC date mismatch
     const now = new Date();
-    const todayStr = now.toISOString().slice(0, 10);
+    const colombiaDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Bogota" }));
+    const todayStr = `${colombiaDate.getFullYear()}-${String(colombiaDate.getMonth() + 1).padStart(2, "0")}-${String(colombiaDate.getDate()).padStart(2, "0")}`;
     // billing_period.end_date must be strictly after start_date
-    const nextDay = new Date(now);
+    const nextDay = new Date(colombiaDate);
     nextDay.setDate(nextDay.getDate() + 1);
-    const endDateStr = nextDay.toISOString().slice(0, 10);
+    const endDateStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth() + 1).padStart(2, "0")}-${String(nextDay.getDate()).padStart(2, "0")}`;
 
     const factusItems = data.items.map((item) => ({
       code_reference: item.code,
@@ -98,11 +100,11 @@ export async function createInvoiceAction(data: CreateInvoiceInput): Promise<Inv
     }));
 
     // Calcular fecha de vencimiento (30 dias para credito, hoy para contado)
-    const dueDate = new Date(now);
+    const dueDate = new Date(colombiaDate);
     if (data.payment.paymentForm === "2") {
       dueDate.setDate(dueDate.getDate() + 30);
     }
-    const dueDateStr = dueDate.toISOString().slice(0, 10);
+    const dueDateStr = `${dueDate.getFullYear()}-${String(dueDate.getMonth() + 1).padStart(2, "0")}-${String(dueDate.getDate()).padStart(2, "0")}`;
 
     const payload: CreateBillRequest = {
       document: "01",

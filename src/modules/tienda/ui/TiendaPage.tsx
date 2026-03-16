@@ -1,20 +1,23 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Store, ShoppingCart, Loader2, AlertCircle } from "lucide-react";
+import { Store, ShoppingCart, Loader2, AlertCircle, Building2 } from "lucide-react";
 import { useSession } from "@/modules/layout/ui/AuthContext";
 import { Card } from "@/shared/components/Card";
 import { Badge } from "@/shared/components/Badge";
+import { Button } from "@/shared/components/Button";
 import {
   getStoreProductsAction,
   getNumberingRangeAction,
   createInvoiceAction,
 } from "../infrastructure/tienda.actions";
+import { getAllBranchesAction } from "@/modules/branches/infrastructure/branches.actions";
 import { ProductGrid } from "./ProductGrid";
 import { Cart } from "./Cart";
 import { CheckoutForm } from "./CheckoutForm";
 import { InvoiceSuccess } from "./InvoiceSuccess";
 import type { Product } from "@/modules/products/domain/products.types";
+import type { Branch } from "@/modules/branches/domain/branches.types";
 import type {
   CartItem,
   CustomerData,
@@ -26,7 +29,15 @@ import type {
 type Step = "products" | "checkout" | "result";
 
 export function TiendaPage() {
-  const { id: sellerId, fullName: sellerName, branchId } = useSession();
+  const { id: sellerId, fullName: sellerName, branchId: sessionBranchId, role } = useSession();
+
+  // Super admin branch selection
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+  const [loadingBranches, setLoadingBranches] = useState(false);
+
+  const isSuperAdmin = role === "super_admin";
+  const branchId = sessionBranchId ?? selectedBranchId;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -37,6 +48,23 @@ export function TiendaPage() {
   const [invoicing, setInvoicing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showMobileCart, setShowMobileCart] = useState(false);
+
+  // Load branches for super admin
+  useEffect(() => {
+    if (isSuperAdmin && !sessionBranchId) {
+      setLoadingBranches(true);
+      getAllBranchesAction()
+        .then((all) => {
+          const active = all.filter((b) => b.isActive);
+          setBranches(active);
+          if (active.length === 1) {
+            setSelectedBranchId(active[0].id);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoadingBranches(false));
+    }
+  }, [isSuperAdmin, sessionBranchId]);
 
   const loadProducts = useCallback(async () => {
     if (!branchId) return;
@@ -161,6 +189,67 @@ export function TiendaPage() {
   }
 
   if (!branchId) {
+    // Super admin: show branch selector
+    if (isSuperAdmin) {
+      if (loadingBranches) {
+        return (
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
+            <p className="text-sm text-gray-500 dark:text-gray-400">Cargando sucursales...</p>
+          </div>
+        );
+      }
+
+      if (branches.length === 0) {
+        return (
+          <div className="flex flex-col items-center justify-center py-24 gap-3">
+            <AlertCircle className="h-10 w-10 text-amber-500" />
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+              No hay sucursales activas.<br />
+              Crea una sucursal para usar la tienda.
+            </p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="mx-auto max-w-lg py-12">
+          <Card>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Seleccionar Sucursal
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Elige la sucursal desde la cual vas a facturar
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {branches.map((branch) => (
+                <button
+                  key={branch.id}
+                  onClick={() => setSelectedBranchId(branch.id)}
+                  className="w-full text-left rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3 hover:border-blue-400 hover:bg-blue-50 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 transition-colors"
+                >
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {branch.name}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {branch.city} — {branch.address}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
+      );
+    }
+
+    // Regular user without branch
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
         <AlertCircle className="h-10 w-10 text-amber-500" />
@@ -214,9 +303,28 @@ export function TiendaPage() {
           </div>
         </div>
 
-        {!numberingRange && (
-          <Badge variant="warning">Sin rango de numeracion</Badge>
-        )}
+        <div className="flex items-center gap-3">
+          {isSuperAdmin && selectedBranchId && (
+            <button
+              onClick={() => {
+                setSelectedBranchId(null);
+                setProducts([]);
+                setCart([]);
+                setStep("products");
+              }}
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <Building2 className="h-3.5 w-3.5" />
+              {branches.find((b) => b.id === selectedBranchId)?.name ?? "Sucursal"}
+              <span className="text-gray-400">|</span>
+              <span className="text-blue-500">Cambiar</span>
+            </button>
+          )}
+
+          {!numberingRange && (
+            <Badge variant="warning">Sin rango de numeracion</Badge>
+          )}
+        </div>
 
         {/* Mobile cart toggle */}
         <button
